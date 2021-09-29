@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package proto;
+package keshavbhattad.proto;
 
-// import "memory_message.proto";
+import "memory_message.proto";
 
-option go_package = "github.com/keshavbhattad/book/pb";
+option go_package = ".;pb";
 
 message CPU {
     string brand = 1;
@@ -20,5 +20,5 @@ message GPU {
     string name = 2;
     double min_ghz = 3;
     double max_ghz = 4;
-    // required Memory mem = 5;
+    Memory mem = 5;
 }

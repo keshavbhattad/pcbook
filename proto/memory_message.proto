@@ -1,6 +1,8 @@
 syntax = "proto3";
 
-option go_package = "github.com/keshavbhattad/book/pb";
+package keshavbhattad.proto;
+
+option go_package = ".;pb";
 
 message Memory {
     enum Unit{
