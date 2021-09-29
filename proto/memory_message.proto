@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package keshavbhattad.proto;
+package keshavbhattad.pcbook;
 
 option go_package = ".;pb";
 
