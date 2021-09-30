@@ -1,4 +1,4 @@
-module github.com/keshavbhattad/book
+module gitlab.com/keshavbhattad/pcbook
 
 go 1.16
 
