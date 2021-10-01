@@ -1,0 +1,62 @@
+{
+	"id": "5bc3d49e-4554-4f04-8451-d64993aa7f1f",
+	"brand": "Lenovo",
+	"name": "Thinkpad P53",
+	"cpu": {
+		"brand": "AMD",
+		"name": "Ryzen 3 PRO 3200GE",
+		"number_of_cores": 3,
+		"number_of_threads": 8,
+		"min_ghz": 3.085473332503918,
+		"max_ghz": 4.17289013576658
+	},
+	"ram": {
+		"value": "5",
+		"unit": "GIGYBYTE"
+	},
+	"gpus": [
+		{
+			"brand": "AMD",
+			"name": "RX Vega-56",
+			"min_ghz": 1.2711867556564533,
+			"max_ghz": 1.6041067730733443,
+			"memory": {
+				"value": "2",
+				"unit": "GIGYBYTE"
+			}
+		}
+	],
+	"storages": [
+		{
+			"driver": "SSD",
+			"memory": {
+				"value": "621",
+				"unit": "GIGYBYTE"
+			}
+		},
+		{
+			"driver": "HDD",
+			"memory": {
+				"value": "5",
+				"unit": "TERABYTE"
+			}
+		}
+	],
+	"screen": {
+		"screen_size": 16.553377,
+		"resolution": {
+			"width": 3667,
+			"height": 2063
+		},
+		"panel": "OLED",
+		"multitouch": true
+	},
+	"keyboard": {
+		"layout": "QWERTZ",
+		"backlit": true
+	},
+	"weight_kg": 1.2523091411301512,
+	"price_inr": 55577.06778654155,
+	"release_year": 2021,
+	"updated_at": "2021-09-30T07:26:36.719497Z"
+}
