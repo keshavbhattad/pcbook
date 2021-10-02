@@ -39,6 +39,16 @@ func (server *LaptopServer) CreateLaptop(ctx context.Context, req *pb.CreateLapt
 		laptop.Id = id.String()
 	}
 
+	if ctx.Err() == context.Canceled {
+		log.Print("Request is canceled")
+		return nil, status.Error(codes.Canceled, "Request is canceled")
+	}
+
+	if ctx.Err() == context.DeadlineExceeded {
+		log.Print("Deadline is exceeded")
+		return nil, status.Error(codes.DeadlineExceeded, "Deadline is exeeded")
+	}
+
 	// Save laptop Id on database normally
 	// Here laptop Id is stored in-memory
 	err := server.Store.Save(laptop)
