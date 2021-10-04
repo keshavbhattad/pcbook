@@ -1,27 +1,27 @@
 {
-	"id": "5bc3d49e-4554-4f04-8451-d64993aa7f1f",
+	"id": "2919e178-d68f-4141-a8a9-07bb5daa5945",
 	"brand": "Lenovo",
-	"name": "Thinkpad P53",
+	"name": "Thinkpad S1",
 	"cpu": {
 		"brand": "AMD",
-		"name": "Ryzen 3 PRO 3200GE",
+		"name": "Ryzen 7 PRO 2700U",
 		"number_of_cores": 3,
-		"number_of_threads": 8,
-		"min_ghz": 3.085473332503918,
-		"max_ghz": 4.17289013576658
+		"number_of_threads": 11,
+		"min_ghz": 2.0049179390301233,
+		"max_ghz": 2.1487304999887233
 	},
 	"ram": {
-		"value": "5",
+		"value": "4",
 		"unit": "GIGYBYTE"
 	},
 	"gpus": [
 		{
-			"brand": "AMD",
-			"name": "RX Vega-56",
-			"min_ghz": 1.2711867556564533,
-			"max_ghz": 1.6041067730733443,
+			"brand": "NVIDIA",
+			"name": "RX 5700-XT",
+			"min_ghz": 1.482416255692614,
+			"max_ghz": 1.503117200163386,
 			"memory": {
-				"value": "2",
+				"value": "4",
 				"unit": "GIGYBYTE"
 			}
 		}
@@ -30,7 +30,7 @@
 		{
 			"driver": "SSD",
 			"memory": {
-				"value": "621",
+				"value": "803",
 				"unit": "GIGYBYTE"
 			}
 		},
@@ -43,20 +43,20 @@
 		}
 	],
 	"screen": {
-		"screen_size": 16.553377,
+		"screen_size": 14.390355,
 		"resolution": {
-			"width": 3667,
-			"height": 2063
+			"width": 4193,
+			"height": 2359
 		},
-		"panel": "OLED",
+		"panel": "IPS",
 		"multitouch": true
 	},
 	"keyboard": {
 		"layout": "QWERTZ",
-		"backlit": true
+		"backlit": false
 	},
-	"weight_kg": 1.2523091411301512,
-	"price_inr": 55577.06778654155,
+	"weight_kg": 1.5810999319763988,
+	"price_inr": 84586.39977695627,
 	"release_year": 2021,
-	"updated_at": "2021-09-30T07:26:36.719497Z"
+	"updated_at": "2021-10-04T12:00:36.574558Z"
 }
