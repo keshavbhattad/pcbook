@@ -27,34 +27,39 @@ func TestServerCreateLaptop(t *testing.T) {
 	require.NoError(t, err)
 
 	testCases := []struct {
-		name   string
-		laptop *pb.Laptop
-		store  service.LaptopStore
-		code   codes.Code
+		name        string
+		laptop      *pb.Laptop
+		laptopStore service.LaptopStore
+		imageStore  service.ImageStore
+		code        codes.Code
 	}{
 		{
-			name:   "Success_with_id",
-			laptop: sample.NewLaptop(),
-			store:  service.NewInMemoryLaptopStore(),
-			code:   codes.OK,
+			name:        "Success_with_id",
+			laptop:      sample.NewLaptop(),
+			laptopStore: service.NewInMemoryLaptopStore(),
+			imageStore:  nil,
+			code:        codes.OK,
 		},
 		{
-			name:   "Success_no_id",
-			laptop: laptopNoID,
-			store:  service.NewInMemoryLaptopStore(),
-			code:   codes.OK,
+			name:        "Success_no_id",
+			laptop:      laptopNoID,
+			laptopStore: service.NewInMemoryLaptopStore(),
+			imageStore:  nil,
+			code:        codes.OK,
 		},
 		{
-			name:   "Failure_invalid_uuid",
-			laptop: laptopInvalidID,
-			store:  service.NewInMemoryLaptopStore(),
-			code:   codes.InvalidArgument,
+			name:        "Failure_invalid_uuid",
+			laptop:      laptopInvalidID,
+			laptopStore: service.NewInMemoryLaptopStore(),
+			imageStore:  nil,
+			code:        codes.InvalidArgument,
 		},
 		{
-			name:   "Failure_duplicate_id",
-			laptop: laptopDuplicateID,
-			store:  storeDuplicateID,
-			code:   codes.AlreadyExists,
+			name:        "Failure_duplicate_id",
+			laptop:      laptopDuplicateID,
+			laptopStore: storeDuplicateID,
+			imageStore:  nil,
+			code:        codes.AlreadyExists,
 		},
 	}
 
@@ -68,7 +73,7 @@ func TestServerCreateLaptop(t *testing.T) {
 				Laptop: tc.laptop,
 			}
 
-			server := service.NewLaptopServer(tc.store)
+			server := service.NewLaptopServer(tc.laptopStore, tc.imageStore)
 			res, err := server.CreateLaptop(context.Background(), req)
 
 			if tc.code == codes.OK {

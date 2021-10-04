@@ -1,8 +1,10 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"io"
 	"log"
 
 	"github.com/google/uuid"
@@ -11,13 +13,17 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+const MaxImageSize = 2 << 20
+
 type LaptopServer struct {
-	Store LaptopStore
+	laptopStore LaptopStore
+	imageStore  ImageStore
 }
 
-func NewLaptopServer(store LaptopStore) *LaptopServer {
+func NewLaptopServer(laptopStore LaptopStore, imageStore ImageStore) *LaptopServer {
 	return &LaptopServer{
-		Store: store,
+		laptopStore: laptopStore,
+		imageStore:  imageStore,
 	}
 }
 
@@ -28,7 +34,7 @@ func (server *LaptopServer) SearchLaptop(
 	filter := req.GetFilter()
 	log.Printf("Received a search-laptop request with filter: %v", filter)
 
-	err := server.Store.Search(
+	err := server.laptopStore.Search(
 		stream.Context(),
 		filter,
 		func(laptop *pb.Laptop) error {
@@ -70,19 +76,13 @@ func (server *LaptopServer) CreateLaptop(ctx context.Context, req *pb.CreateLapt
 		laptop.Id = id.String()
 	}
 
-	if ctx.Err() == context.Canceled {
-		log.Print("Request is canceled")
-		return nil, status.Error(codes.Canceled, "Request is canceled")
-	}
-
-	if ctx.Err() == context.DeadlineExceeded {
-		log.Print("Deadline is exceeded")
-		return nil, status.Error(codes.DeadlineExceeded, "Deadline is exeeded")
+	if err := contextError(ctx); err != nil {
+		return nil, err
 	}
 
 	// Save laptop Id on database normally
 	// Here laptop Id is stored in-memory
-	err := server.Store.Save(laptop)
+	err := server.laptopStore.Save(laptop)
 	if err != nil {
 		code := codes.Internal
 		if errors.Is(err, ErrAlreadyExists) {
@@ -95,4 +95,94 @@ func (server *LaptopServer) CreateLaptop(ctx context.Context, req *pb.CreateLapt
 		Id: laptop.Id,
 	}
 	return res, nil
+}
+
+func contextError(ctx context.Context) error {
+	switch ctx.Err() {
+	case context.Canceled:
+		return logError(status.Error(codes.Canceled, "Request is canceled"))
+
+	case context.DeadlineExceeded:
+		return logError(status.Error(codes.DeadlineExceeded, "Deadline is exeeded"))
+	default:
+		return nil
+	}
+}
+
+func (server *LaptopServer) UploadImage(stream pb.LaptopService_UploadImageServer) error {
+	req, err := stream.Recv()
+	if err != nil {
+		return logError(status.Errorf(codes.Unknown, "Cannot receive image info"))
+	}
+
+	laptopID := req.GetInfo().GetLaptopId()
+	imageType := req.GetInfo().GetImageType()
+	log.Printf("Received an upload-image request for laptop %s with image type %s\n", laptopID, imageType)
+
+	laptop, err := server.laptopStore.Find(laptopID)
+	if err != nil {
+		return logError(status.Errorf(codes.Internal, "Cannot find laptop: %v", err))
+	}
+	if laptop == nil {
+		return logError(status.Errorf(codes.NotFound, "Laptop not found: %v", err))
+	}
+
+	imageData := bytes.Buffer{}
+	imageSize := 0
+
+	for {
+		if err := contextError(stream.Context()); err != nil {
+			return nil
+		}
+
+		log.Print("Waiting to receive more data")
+
+		req, err := stream.Recv()
+		if err == io.EOF {
+			log.Print("No more data")
+			break
+		}
+		if err != nil {
+			return logError(status.Errorf(codes.Unknown, "Cannot receive chunk: %v", err))
+		}
+
+		chunk := req.GetChunkData()
+		size := len(chunk)
+		imageSize += size
+
+		if imageSize > MaxImageSize {
+			return logError(status.Error(codes.InvalidArgument, "File is too large"))
+		}
+
+		_, err = imageData.Write(chunk)
+		if err != nil {
+			return logError(status.Errorf(codes.Internal, "Cannot write chunk data: %v", err))
+		}
+	}
+
+	imageID, err := server.imageStore.Save(laptopID, imageType, imageData)
+	if err != nil {
+		return logError(status.Errorf(codes.Internal, "Cannot save image to the store: %v", err))
+	}
+
+	res := &pb.UploadImageResponse{
+		Id:   imageID,
+		Size: uint32(imageSize),
+	}
+
+	err = stream.SendAndClose(res)
+	if err != nil {
+		return logError(status.Errorf(codes.Unknown, "Cannot send the response and close the stream: %v", err))
+	}
+
+	log.Printf("Image is successfully saved with id: %s and size: %d", imageID, imageSize)
+
+	return nil
+}
+
+func logError(err error) error {
+	if err != nil {
+		log.Print(err)
+	}
+	return err
 }
